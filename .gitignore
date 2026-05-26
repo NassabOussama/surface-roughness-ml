@@ -33,3 +33,6 @@ data/full_dataset/
 # Logs
 *.log
 logs/
+
+# Original research data (local only)
+old/
