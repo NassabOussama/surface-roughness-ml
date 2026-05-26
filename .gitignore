@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ML
+mlruns/
+*.pth
+*.pt
+*.ckpt
+outputs/
+checkpoints/
+
+# Data (real dataset stays local)
+data/full_dataset/
+
+# Logs
+*.log
+logs/
