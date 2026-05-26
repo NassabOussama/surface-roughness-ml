@@ -36,3 +36,10 @@ logs/
 
 # Original research data (local only)
 old/
+
+# Virtual environment
+venv/
+
+# Agora-code & Claude Code local config
+.claude/
+.mcp.json
