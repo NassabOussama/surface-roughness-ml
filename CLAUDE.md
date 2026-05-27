@@ -77,8 +77,21 @@ Entry point: `train.py` (`config.py::Config` holds all hyperparameters).
 - **AMP** (mixed precision) auto-enabled on CUDA.
 - Early stopping on val accuracy (patience 15, min_delta 1e-4); best weights restored
   before test evaluation.
+- **Decoupled seeds:** `--split_seed` (default 42) controls *only* the train/val/test
+  partition; `--seed` controls training randomness (weight-head init, batch order,
+  augmentation). Fixing `--split_seed` while varying `--seed` gives multiple runs on the
+  *same* test set — the correct setup for comparing models. Note: training is not
+  bit-deterministic on GPU (AMP + non-deterministic CUDA kernels), so same-seed runs
+  still vary slightly.
+- **K-fold CV:** `--kfold N` (N>1) runs N folds of group-stratified CV (groups kept
+  together, stratified by grit, partitioned by `split_seed`); each fold carves a val set
+  from its train portion for early stopping. Reports fold-averaged mean ± std and writes
+  `cv_summary.csv`. `--kfold 0` (default) = single split, unchanged behaviour. Given only
+  90 samples, k-fold uses the data far better than a single 56-image test split.
 - **MLflow** logging (experiment `surface-roughness-classification`): params, per-epoch
-  metrics, the checkpoint, training-history + confusion-matrix plots, and the model.
+  metrics, plots, and (single-split only) the checkpoint + pickled model. K-fold logs one
+  nested run per fold under a parent run with `cv_*_mean`/`cv_*_std`; per-fold heavy model
+  artifacts are skipped to avoid duplicating GBs (checkpoints still land on disk).
 - Augmentation (`data/transforms.py`): train uses RandomResizedCrop, rotation/flips,
   light color jitter, occasional Gaussian blur; val/test use Resize+CenterCrop. ImageNet
   normalization throughout. Input size 224.
@@ -111,7 +124,13 @@ python train.py \
 # Train the alternative model
 python train.py --images_path old/Images --labels_path old/Labelisation_CSV.csv --model film_resnet50
 
-# Useful train flags: --batch_size --epochs --lr --seed
+# Multiple training seeds on the SAME fixed test set (for model comparison)
+python train.py ... --model vit_grit --split_seed 42 --seed 123
+
+# 5-fold group-stratified cross-validation
+python train.py ... --model vit_grit --kfold 5 --split_seed 42
+
+# Useful train flags: --batch_size --epochs --lr --seed --split_seed --kfold
 
 # Serve API (needs a checkpoint at ./model.pth or CHECKPOINT_PATH)
 CHECKPOINT_PATH=outputs/<checkpoint>.pth uvicorn api.main:app --host 0.0.0.0 --port 8000

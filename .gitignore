@@ -21,6 +21,7 @@ Thumbs.db
 
 # ML
 mlruns/
+mlflow.db
 *.pth
 *.pt
 *.ckpt

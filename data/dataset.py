@@ -72,13 +72,23 @@ class RoughnessDataset(Dataset):
         return image, grit_idx, label
 
 
+def _rows_by_groups(rows: List[dict], train_set, val_set, test_set):
+    assert not (train_set & val_set) and not (train_set & test_set) and not (val_set & test_set)
+    return (
+        [r for r in rows if r["group_id"] in train_set],
+        [r for r in rows if r["group_id"] in val_set],
+        [r for r in rows if r["group_id"] in test_set],
+    )
+
+
 def group_split(
     rows: List[dict],
     config: Config,
 ) -> Tuple[List[dict], List[dict], List[dict]]:
     """
     Stratified group split so all 4 images of a sample stay in the same fold.
-    Stratification is by grit value to preserve distribution.
+    Stratification is by grit value to preserve distribution. Controlled by
+    ``split_seed`` only — independent of training randomness.
     """
     from sklearn.model_selection import train_test_split
 
@@ -89,25 +99,54 @@ def group_split(
     train_ids, temp_ids, _, temp_grits = train_test_split(
         group_ids, grits,
         test_size=config.val_split + config.test_split,
-        random_state=config.random_seed,
+        random_state=config.split_seed,
         stratify=grits,
     )
     rel_test = config.test_split / (config.val_split + config.test_split)
     val_ids, test_ids = train_test_split(
         temp_ids,
         test_size=rel_test,
-        random_state=config.random_seed,
+        random_state=config.split_seed,
         stratify=temp_grits,
     )
 
-    train_set = set(train_ids)
-    val_set = set(val_ids)
-    test_set = set(test_ids)
+    return _rows_by_groups(rows, set(train_ids), set(val_ids), set(test_ids))
 
-    assert not (train_set & val_set) and not (train_set & test_set) and not (val_set & test_set)
 
-    return (
-        [r for r in rows if r["group_id"] in train_set],
-        [r for r in rows if r["group_id"] in val_set],
-        [r for r in rows if r["group_id"] in test_set],
-    )
+def group_kfold_split(
+    rows: List[dict],
+    config: Config,
+) -> List[Tuple[List[dict], List[dict], List[dict]]]:
+    """
+    Group-stratified k-fold split. Each fold's held-out groups form the test
+    set; a validation set is carved from the remaining groups for early
+    stopping. Groups (a sample's 4 images) stay together; stratification is by
+    grit. Partitioning is controlled by ``split_seed`` only, so every fold is
+    identical across training seeds.
+
+    Returns a list of ``config.kfold`` ``(train_rows, val_rows, test_rows)`` tuples.
+    """
+    from sklearn.model_selection import StratifiedKFold, train_test_split
+
+    groups = list({r["group_id"]: r for r in rows}.values())
+    group_ids = [g["group_id"] for g in groups]
+    grits = [g["grit"] for g in groups]
+
+    skf = StratifiedKFold(n_splits=config.kfold, shuffle=True, random_state=config.split_seed)
+    rel_val = config.val_split / (config.train_split + config.val_split)
+
+    folds = []
+    for tv_idx, test_idx in skf.split(group_ids, grits):
+        tv_ids = [group_ids[i] for i in tv_idx]
+        tv_grits = [grits[i] for i in tv_idx]
+        test_ids = [group_ids[i] for i in test_idx]
+
+        train_ids, val_ids = train_test_split(
+            tv_ids,
+            test_size=rel_val,
+            random_state=config.split_seed,
+            stratify=tv_grits,
+        )
+        folds.append(_rows_by_groups(rows, set(train_ids), set(val_ids), set(test_ids)))
+
+    return folds

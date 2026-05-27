@@ -45,7 +45,9 @@ class Config:
     train_split: float = 0.70
     val_split: float = 0.15
     test_split: float = 0.15
-    random_seed: int = 42
+    random_seed: int = 42      # training randomness: init, batch order, augmentation
+    split_seed: int = 42       # data partition only (single split + k-fold folds)
+    kfold: int = 0             # 0 = single split; N>1 = N-fold group-stratified CV
 
     # === EARLY STOPPING ===
     patience: int = 15
