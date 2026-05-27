@@ -108,11 +108,15 @@ def fig_benchmark():
         ax.set_ylabel(mname)
         ax.set_title(mname)
         ax.axhline(1 / 3, ls=":", c="grey", lw=1)
-        ax.text(1.45, 1 / 3 + 0.01, "chance", color="grey", fontsize=8, ha="right")
+        # label sits in the empty gap between the two bar groups
+        ax.text(0.5, 1 / 3 + 0.015, "chance", color="grey", fontsize=8,
+                ha="center", va="bottom")
 
-    axes[0].legend(loc="lower left")
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=2,
+               bbox_to_anchor=(0.5, 1.0), fontsize=10.5)
     fig.suptitle("Benchmark comparison — mean ± std across runs",
-                 fontsize=14, fontweight="bold", y=1.02)
+                 fontsize=14, fontweight="bold", y=1.11)
     out = f"{ASSETS}/benchmark_comparison.png"
     fig.savefig(out)
     plt.close(fig)
@@ -221,8 +225,11 @@ def fig_per_class():
     ax.set_xticks(x); ax.set_xticklabels(CLASSES)
     ax.set_ylim(0, 1.05)
     ax.set_ylabel("Per-class accuracy (recall)")
-    ax.set_title(f"Per-class accuracy — aggregated over 5-fold CV (n={n} images)")
-    ax.legend(loc="lower center")
+    handles, labels = ax.get_legend_handles_labels()
+    fig.legend(handles, labels, loc="lower center", ncol=2,
+               bbox_to_anchor=(0.5, 1.0), fontsize=10.5)
+    fig.suptitle(f"Per-class accuracy — aggregated over 5-fold CV (n={n} images)",
+                 fontsize=13, fontweight="bold", y=1.09)
     out = f"{ASSETS}/per_class_accuracy.png"
     fig.savefig(out)
     plt.close(fig)
