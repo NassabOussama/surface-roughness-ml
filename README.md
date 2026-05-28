@@ -2,6 +2,10 @@
 
 **Vision-based surface roughness classification for machined metal parts — from a microscopy image and the abrasive grit, predict whether a surface is Smooth, Medium, or Rough.**
 
+### 🚀 **[Try the live demo →](https://surface-roughness-demo.streamlit.app)**
+
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://surface-roughness-demo.streamlit.app)
+
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.5-EE4C2C?logo=pytorch&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-API-009688?logo=fastapi&logoColor=white)
@@ -205,7 +209,13 @@ To try the model without the full dataset, use the bundled demo images in [`data
 
 ## 🌐 Live demo
 
-🔗 **Live demo:** _coming soon_ — a hosted Streamlit app where you can upload an image, pick a grit value, and get an instant roughness prediction.
+### 🚀 [surface-roughness-demo.streamlit.app](https://surface-roughness-demo.streamlit.app)
+
+A hosted Streamlit app where you can classify a machined surface in seconds: pick the abrasive grit value, give it a microscopy image, and get the predicted roughness class with a confidence breakdown across Smooth / Medium / Rough.
+
+- 🖱️ **No upload required** — the demo includes six bundled [sample images](data/sample_images/) (two per class); click any one to load it (the correct grit is filled in automatically) and classify instantly. You can also upload your own image.
+- 🧠 **Model:** the **FiLM-ResNet50** checkpoint (best cross-validation fold, **87.5%** accuracy), loaded directly in-process — no backend required.
+- ⚙️ Runs the standalone front-end [`ui/app_standalone.py`](ui/app_standalone.py) on Streamlit Community Cloud (CPU).
 
 The repository ships **two Streamlit front-ends** with the same UX but different backends:
 
