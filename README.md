@@ -207,12 +207,21 @@ To try the model without the full dataset, use the bundled demo images in [`data
 
 ## 📸 Screenshots
 
-> _Streamlit interface screenshots will be added here._
+**Streamlit demo — main interface.** Upload a microscopy image and pick the grit value used to machine the surface.
 
-<!-- Add once captured, e.g.:
-![Streamlit UI — upload](assets/screenshots/ui_upload.png)
-![Streamlit UI — prediction](assets/screenshots/ui_prediction.png)
--->
+![Streamlit main UI](assets/screenshots/streamlit_main_ui.png)
+
+**Rough surface loaded (grit 60).** The uploaded image is previewed before classification.
+
+![Streamlit — rough surface sample](assets/screenshots/streamlit_rough_sample.png)
+
+**Medium surface loaded (grit 180).** Another sample ready to classify in the app.
+
+![Streamlit — medium surface sample](assets/screenshots/streamlit_medium_sample.png)
+
+**FastAPI interactive docs (Swagger UI).** The `POST /predict` endpoint takes an image plus a grit value and returns the predicted class, confidence, and per-class probabilities; `GET /health` reports model status.
+
+![FastAPI Swagger docs](assets/screenshots/api_docs.png)
 
 ---
 
