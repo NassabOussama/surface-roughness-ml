@@ -18,7 +18,10 @@ EVAL_TRANSFORM = T.Compose([
 
 
 def _load_model(checkpoint_path: str, device: torch.device) -> tuple:
-    ckpt = torch.load(checkpoint_path, map_location=device)
+    # weights_only=False: our checkpoints embed a metrics dict with numpy
+    # objects, which PyTorch 2.6+ blocks under the default weights_only=True.
+    # We trust our own checkpoints, so opt out.
+    ckpt = torch.load(checkpoint_path, map_location=device, weights_only=False)
 
     from models.vit_grit import ViTGRiT
     from models.film_resnet50 import FiLMResNet50
