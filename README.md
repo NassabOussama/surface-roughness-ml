@@ -145,8 +145,9 @@ surface-roughness-ml/
 │   ├── main.py             #   /predict + /health endpoints
 │   ├── predictor.py        #   checkpoint loading + inference wrapper
 │   └── Dockerfile
-├── ui/                     # Streamlit demo front-end
-│   ├── app.py
+├── ui/                     # Streamlit demo front-ends
+│   ├── app.py              #   local/Docker — calls the FastAPI service
+│   ├── app_standalone.py   #   Streamlit Cloud — loads the model in-process
 │   └── Dockerfile
 ├── data/
 │   ├── dataset.py          # group-stratified split + k-fold + Dataset
@@ -164,7 +165,8 @@ surface-roughness-ml/
 ├── evaluate.py             # metrics + plotting
 ├── make_assets.py          # regenerates the benchmark figures
 ├── docker-compose.yml
-└── requirements.txt
+├── requirements.txt            # full project deps (training + serving + UI)
+└── requirements-streamlit.txt  # lean CPU-only deps for the standalone Cloud demo
 ```
 
 ---
@@ -204,6 +206,13 @@ To try the model without the full dataset, use the bundled demo images in [`data
 ## 🌐 Live demo
 
 🔗 **Live demo:** _coming soon_ — a hosted Streamlit app where you can upload an image, pick a grit value, and get an instant roughness prediction.
+
+The repository ships **two Streamlit front-ends** with the same UX but different backends:
+
+| File | Backend | When to use it |
+|------|---------|----------------|
+| [`ui/app.py`](ui/app.py) | Calls the FastAPI service over HTTP | **Local or Docker** deployment (pairs with the [Quick start — Docker](#-quick-start--docker) stack) |
+| [`ui/app_standalone.py`](ui/app_standalone.py) | Loads the model directly in-process | **Streamlit Community Cloud** — uses the lean [`requirements-streamlit.txt`](requirements-streamlit.txt) (CPU-only torch). Checkpoint location (local path or http(s) URL) is configurable via Streamlit secrets (`checkpoint_path`) or the `CHECKPOINT_PATH` env variable. Includes a sample-image picker so visitors can test without uploading. |
 
 ## 📸 Screenshots
 

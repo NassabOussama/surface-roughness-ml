@@ -1,0 +1,13 @@
+# Dependencies for the standalone Streamlit demo (ui/app_standalone.py).
+# Used on Streamlit Community Cloud — kept minimal for a fast, light deploy.
+# CPU-only torch wheels are pulled from PyTorch's CPU index to avoid the
+# ~2.5 GB CUDA-bundled default.
+
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+torch==2.5.1+cpu
+torchvision==0.20.1+cpu
+timm>=1.0.0
+streamlit>=1.32.0
+Pillow>=10.0.0
+numpy>=1.26.0
