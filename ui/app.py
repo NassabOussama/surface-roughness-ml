@@ -25,7 +25,7 @@ uploaded = st.file_uploader("Upload image", type=["png", "jpg", "jpeg"])
 
 if uploaded:
     image = Image.open(uploaded).convert("RGB")
-    st.image(image, caption="Uploaded image", use_column_width=True)
+    st.image(image, caption="Uploaded image", use_container_width=True)
 
     if st.button("Classify", type="primary"):
         with st.spinner("Running inference…"):
